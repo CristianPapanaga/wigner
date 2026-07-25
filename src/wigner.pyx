@@ -41,6 +41,12 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
     cdef np.ndarray[np.float_t, ndim = 1, mode = "c"] randfloats, i_spin_initial, i_spin_candidate, i_spin_diff
     cdef np.ndarray[np.float_t, ndim = 2, mode = "c"] randgauss, spin_lattice, randspins
 
+    # Fast temporary registers for explicit 3D vector operations
+    cdef double sx_init, sy_init, sz_init
+    cdef double sx_cand, sy_cand, sz_cand
+    cdef double sdx, sdy, sdz
+    cdef double tmp_x, tmp_y, tmp_z
+
     N = <np.int64_t>particle_lattice.shape[0]
     L = <np.int64_t>sqrt(<double>N)
     n_neighbours = <np.int64_t>nth_neighbours * 4
@@ -61,24 +67,27 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
     # Give particles spins, which are saved as a separate spin_lattice.
     spin_lattice = np.zeros((N, 3))
     k = 0
-    for idx_enum, val_enum in enumerate(particle_lattice):
-        if val_enum == 1:
-            spin_lattice[idx_enum] = randspins[k]
+    for idx_enum in range(N):
+        if particle_lattice[idx_enum] == 1:
+            spin_lattice[idx_enum, 0] = randspins[k, 0]
+            spin_lattice[idx_enum, 1] = randspins[k, 1]
+            spin_lattice[idx_enum, 2] = randspins[k, 2]
             k += 1
 
-    # Get energy. We only need to loop over occupied sites; unoccupied sites contribute 0 to the energy.
     E = 0.0
-    for i in filled_coords:
-        i_spin_initial = spin_lattice[i]
+    for idx_enum in range(filled_coords.shape[0]):
+        i = filled_coords[idx_enum]
+        sx_init = spin_lattice[i, 0]
+        sy_init = spin_lattice[i, 1]
+        sz_init = spin_lattice[i, 2]
         nn_i = lattice_nn[i]
 
-        k = 0
         for k in range(n_neighbours):
             i_neighbor = nn_i[k]
             V = V_list[k]
             J = J_list[k]
-
-            E += (V * <double>particle_lattice[i_neighbor]) + (J * np.dot(i_spin_initial, spin_lattice[i_neighbor]))
+            E += ((V * <double>particle_lattice[i_neighbor])
+             + (J * (sx_init * spin_lattice[i_neighbor, 0] + sy_init * spin_lattice[i_neighbor, 1] + sz_init * spin_lattice[i_neighbor, 2])))
     
     E /= 2
     E_array = []
@@ -106,16 +115,18 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
             # MOVE 1: MOVE ONE PARTICLE TO AN EMPTY SITE #
             ##############################################
 
-            # Choose a random (particle, empty site) pair from the lattice
-            # and retrieve relevant information about those sites.
-
+            # Choose a random (particle, empty site) pair from the lattice.
             i_idx = randints_filled[step]
             j_idx = randints_empty[step]
 
+            # Retrieve the site coordinates, the particle's spin, and the site nearest neighbours.
             i = filled_coords[i_idx]
             j = empty_coords[j_idx]
 
-            i_spin_initial = spin_lattice[i].copy()
+            sx_init = spin_lattice[i, 0]
+            sy_init = spin_lattice[i, 1]
+            sz_init = spin_lattice[i, 2]
+
             nn_i = lattice_nn[i]
             nn_j = lattice_nn[j]
 
@@ -127,12 +138,16 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
                 V = V_list[k]
                 J = J_list[k]
 
-                deltaE -= ((V * <double>particle_lattice[nn]) + (J * np.dot(i_spin_initial, spin_lattice[nn])))
+                deltaE -= ((V * <double>particle_lattice[nn])
+                 + (J * (sx_init * spin_lattice[nn, 0] + sy_init * spin_lattice[nn, 1] + sz_init * spin_lattice[nn, 2])))
 
-            # Move the particle to empty site j.
+            # Move the particle to empty site j, including swapping the spin values.
             particle_lattice[i] = 0
             particle_lattice[j] = 1
-            spin_lattice[[i, j]] = spin_lattice[[j, i]]
+            
+            tmp_x = spin_lattice[i, 0]; tmp_y = spin_lattice[i, 1]; tmp_z = spin_lattice[i, 2]
+            spin_lattice[i, 0] = spin_lattice[j, 0]; spin_lattice[i, 1] = spin_lattice[j, 1]; spin_lattice[i, 2] = spin_lattice[j, 2]
+            spin_lattice[j, 0] = tmp_x; spin_lattice[j, 1] = tmp_y; spin_lattice[j, 2] = tmp_z
 
             # Calculate the change in the contribution after moving, and hence get the deltaE of the move.
             k = 0
@@ -141,18 +156,20 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
                 V = V_list[k]
                 J = J_list[k]
 
-                deltaE += ((V * <double>particle_lattice[nn]) + (J * np.dot(i_spin_initial, spin_lattice[nn])))
+                deltaE += ((V * <double>particle_lattice[nn])
+                 + (J * (sx_init * spin_lattice[nn, 0] + sy_init * spin_lattice[nn, 1] + sz_init * spin_lattice[nn, 2])))
 
             if deltaE < 0 or randfloats[step] < exp(-deltaE/T):
-                # If the move is accepted, swap coords between lists of filled and empty site coordinates
-                # and make sure to swap spin_lattice sites as well.
+                # If the move is accepted, swap coords between lists of filled and empty site coordinates.
                 filled_coords[i_idx], empty_coords[j_idx] = empty_coords[j_idx], filled_coords[i_idx] 
                 E += deltaE
             else:
-                # Move the particle back if the move was not accepted.
+                # If the move is rejected, move the particle back.
                 particle_lattice[i] = 1
                 particle_lattice[j] = 0
-                spin_lattice[[i, j]] = spin_lattice[[j, i]]
+                tmp_x = spin_lattice[i, 0]; tmp_y = spin_lattice[i, 1]; tmp_z = spin_lattice[i, 2]
+                spin_lattice[i, 0] = spin_lattice[j, 0]; spin_lattice[i, 1] = spin_lattice[j, 1]; spin_lattice[i, 2] = spin_lattice[j, 2]
+                spin_lattice[j, 0] = tmp_x; spin_lattice[j, 1] = tmp_y; spin_lattice[j, 2] = tmp_z
 
             deltaE = 0.0
 
@@ -162,13 +179,27 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
 
             # Choose a random particle on the lattice.
             i = filled_coords[randints_filled[step + n_steps]]
-            i_spin_initial = spin_lattice[i].copy()
+
+            # Get particle i's spin and nearest neighbours.
+            sx_init = spin_lattice[i, 0]
+            sy_init = spin_lattice[i, 1]
+            sz_init = spin_lattice[i, 2]
+
             nn_i = lattice_nn[i]
 
             # Choose a new candidate random spin.
-            i_spin_candidate = randspins[step]
-            spin_lattice[i] = i_spin_candidate # This needs to be updated, as for small lattices the spin may self-interact.
-            i_spin_diff = i_spin_candidate - i_spin_initial
+            sx_cand = randspins[step, 0]
+            sy_cand = randspins[step, 1]
+            sz_cand = randspins[step, 2]
+
+            spin_lattice[i, 0] = sx_cand
+            spin_lattice[i, 1] = sy_cand
+            spin_lattice[i, 2] = sz_cand
+
+            # Calculate the change in spin.
+            sdx = sx_cand - sx_init
+            sdy = sy_cand - sy_init
+            sdz = sz_cand - sz_init
 
             # Calculate deltaE.
             k = 0
@@ -176,12 +207,16 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
                 nn = nn_i[k]
                 J = J_list[k]
 
-                deltaE += (J * np.dot(i_spin_diff, spin_lattice[nn]))
+                deltaE += (J * (sdx * spin_lattice[nn, 0] + sdy * spin_lattice[nn, 1] + sdz * spin_lattice[nn, 2]))
 
             if deltaE < 0 or randfloats[step + n_steps] < exp(-deltaE/T):
+                # If the spin change is accepted, change the energy.
                 E += deltaE
             else:
-                spin_lattice[i] = i_spin_initial
+                # If the spin change is rejected, undo the spin change.
+                spin_lattice[i, 0] = sx_init
+                spin_lattice[i, 1] = sy_init
+                spin_lattice[i, 2] = sz_init
 
             ################
             # COLLECT DATA #

@@ -13,7 +13,7 @@ import lattice_utilities as lat_utils
 import wigner
 
 # Parameters
-L = 20
+L = 8
 n_sweeps = 2000
 
 A = 1.0
