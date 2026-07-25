@@ -3,5 +3,13 @@ name = "wigner"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+requires-python = "==3.11.15"
+dependencies = [
+    "cmasher>=1.9.2",
+    "cython==0.29.36",
+    "disutils>=1.4.32.post2",
+    "matplotlib==3.7.3",
+    "numpy==1.24.3",
+    "scipy==1.11.1",
+    "setuptools>=83.0.0",
+]
