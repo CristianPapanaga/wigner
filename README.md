@@ -36,7 +36,7 @@ where:
 
 The system is sampled with the **Metropolis–Hastings** algorithm, using two types of moves:
 
-1. **Particle move (non-local Kawasaki algorithm):** an electron is moved from a randomly chosen occupied site to a randomly chosen empty site. The energy change is computed and the move is accepted with probability $P = \min(1,\, e^{-\Delta E / T})$.
+1. **Particle move (non-local Kawasaki algorithm):** an electron is moved from a randomly chosen occupied site to a randomly chosen empty site. The energy change is computed and the move is accepted with probability $P = \min(1, e^{-\Delta E / T})$.
 
 2. **Single-spin update:** the spin of a randomly chosen electron is replaced by a new random direction on the sphere, and the move is accepted with the same Metropolis probability.
 
