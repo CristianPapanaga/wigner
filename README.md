@@ -144,7 +144,7 @@ uv sync --reinstall-package wigner
 ```
 ## Examples
 
-The figures below show the `testing.py` simulated-annealing run on an 8 × 8 lattice at 75% filling, with equal density and spin couplings ($V = J = 1$). Note that the output is not deterministic and so another run may find a different ordered ground state.
+The figures below show the `testing.py` simulated-annealing run on an 8 × 8 lattice at 75% filling, with equal density and spin couplings ($V = J = 1$) that decay exponentially with neighbour distance. Note that the output is not deterministic and so another run may find a different ordered ground state.
 
 ### Annealing and specific heat
 
