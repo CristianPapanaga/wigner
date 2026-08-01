@@ -4,11 +4,13 @@
 
 ![Poster](assets/poster.png)
 
-`wigner` is a Cython-accelerated Monte Carlo package for simulating **electron crystals** (Wigner crystals) on a square lattice, including both **density (Coulomb gas)** and **spin** interactions. It is motivated by the experimental observation of correlated insulating states at fractional fillings of WS₂/WSe₂ moiré heterobilayers (Huang et al., 2021), and is used to study how the addition of spin degrees of freedom modifies the charge and spin ordering of electron crystals at fractional fillings.
+`wigner` is a Cython-accelerated Monte Carlo package for simulating **electron crystals** (Wigner crystals) on a square lattice with periodic boundary conditions, including both **density (Coulomb gas)** and **spin** interactions. It is motivated by the experimental observation of correlated insulating states at fractional fillings of WS₂/WSe₂ moiré heterobilayers (Huang et al., 2021), and is used to study how the addition of spin degrees of freedom modifies the charge and spin ordering of electron crystals at fractional fillings.
+
+This codebase was created as part of a research internship during the summer of 2023, under the supervision of Dr. Ciarán Hickey at University College Dublin. The above poster was presented at a student conference. The codebase was heavily optimized and properly packaged in 2026.
 
 ## Physics background
 
-At low densities, electrons on a lattice can crystallise into ordered structures known as *Wigner crystals*. In moiré materials such as WS₂/WSe₂ heterobilayers, such electron crystals have been observed at fractional fillings of the moiré lattice. A key open question is how the *spin* of the electrons affects the physics of these crystals.
+At low densities, electrons on a lattice can crystallise into ordered structures known as Wigner crystals. In moiré materials such as WS₂/WSe₂ heterobilayers, such electron crystals have been observed at fractional fillings of the moiré lattice. A key open question is how the spin of the electrons affects the physics of these crystals.
 
 This package models the system as a lattice gas of electrons with classical Heisenberg spins, interacting through:
 
@@ -34,7 +36,7 @@ where:
 
 ### Monte Carlo moves
 
-The system is sampled with the **Metropolis–Hastings** algorithm, using two types of moves:
+The system is sampled with the Metropolis–Hastings algorithm, using two types of moves:
 
 1. **Particle move (non-local Kawasaki algorithm):** an electron is moved from a randomly chosen occupied site to a randomly chosen empty site. The energy change is computed and the move is accepted with probability $P = \min(1, e^{-\Delta E / T})$.
 
@@ -104,6 +106,12 @@ Key parameters of `wigner_anneal`:
 | `thermal_frac` | Fraction of sweeps used for thermalisation (default `0.1`). |
 | `data_collection_interval` | Interval (in sweeps) at which data is collected (default `1`). |
 
+To run this example simulation:
+
+```bash
+uv run src/testing.py
+```
+
 ### Analysing and visualising results
 
 When the simulation finishes, you will be prompted to provide a folder name; the data is saved to `src/data/<folder>/`. The saved data includes the final particle lattice, the spin lattice, the energy array, and the simulation parameters.
@@ -111,7 +119,7 @@ When the simulation finishes, you will be prompted to provide a folder name; the
 To analyse and plot the results, run `src/data_analysis.py` (edit the `data_folder` variable to point at your data):
 
 ```bash
-python src/data_analysis.py
+uv run src/data_analysis.py
 ```
 
 This computes the specific heat and produces the following plots in `src/visualizations/`:
@@ -120,6 +128,14 @@ This computes the specific heat and produces the following plots in `src/visuali
 - **Specific heat plot** — specific heat vs. temperature.
 - **Lattice** — the final charge configuration.
 - **Lattice with spin vectors** — the final charge configuration with spin vectors (arrows show the in-plane spin component; colour shows the out-of-plane component).
+
+### Making changes
+
+Note that if you wish to make changes to the Cython files `wigner.pyx` or `lattice_utlities.pyx`, the package must be manually rebuilt for those changes to apply:
+
+```bash
+uv sync --reinstall-package wigner
+```
 
 ## Project structure
 
