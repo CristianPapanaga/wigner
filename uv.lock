@@ -138,19 +138,6 @@ wheels = [
 ]
 
 [[package]]
-name = "cython"
-version = "0.29.36"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/38/db/df0e99d6c5fe19ee5c981d22aad557be4bdeed3ecfae25d47b84b07f0f98/Cython-0.29.36.tar.gz", hash = "sha256:41c0cfd2d754e383c9eeb95effc9aa4ab847d0c9747077ddd7c0dcb68c3bc01f", size = 2097760, upload-time = "2023-07-04T19:24:05.704Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/6a/bdc0773eeeab3e85b1adfd42cf95c325d024b919c9e1e0db75c82cc7bfc0/Cython-0.29.36-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:74bddfc7dc8958526b2018d3adc1aa6dc9cf2a24095c972e5ad06758c360b261", size = 1809032, upload-time = "2023-07-10T16:03:34.576Z" },
-    { url = "https://files.pythonhosted.org/packages/43/c9/4c8a84731c0948b408d059c2c17c95cbb8b9c2baefe1c6985c0b29a9055e/Cython-0.29.36-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:6c4d7e36fe0211e394adffd296382b435ac22762d14f2fe45c506c230f91cf2d", size = 1911033, upload-time = "2023-07-10T16:03:37.329Z" },
-    { url = "https://files.pythonhosted.org/packages/25/5b/e8ec3ffc79a91e11af67bd7a9e4616966214fc2fd694c526a38b94a25ae4/Cython-0.29.36-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_24_i686.whl", hash = "sha256:0bca6a7504e8cfc63a4d3c7c9b9a04e5d05501942a6c8cee177363b61a32c2d4", size = 1911183, upload-time = "2023-07-10T16:03:40.34Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/a3/43bf5b3ba528a8fa2aa25dd48317e493b46ce838098605277b9efc7a0c1a/Cython-0.29.36-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:17c74f80b06e2fa8ffc8acd41925f4f9922da8a219cd25c6901beab2f7c56cc5", size = 2007074, upload-time = "2023-07-10T16:03:43.152Z" },
-    { url = "https://files.pythonhosted.org/packages/3f/d6/9eed523aeaca42acbaa3e6d3850edae780dc7f8da9df1bf6a2ceb851839c/Cython-0.29.36-py2.py3-none-any.whl", hash = "sha256:95bb13d8be507425d03ebe051f90d4b2a9fdccc64e4f30b35645fdb7542742eb", size = 988293, upload-time = "2023-07-04T19:24:01.262Z" },
-]
-
-[[package]]
 name = "disutils"
 version = "1.4.32.post2"
 source = { registry = "https://pypi.org/simple" }
@@ -406,15 +393,6 @@ wheels = [
 ]
 
 [[package]]
-name = "setuptools"
-version = "83.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/34/26/f5d29e25ffdb535afef2d35cdb55b325298f96debd670da4c325e08d70f4/setuptools-83.0.0.tar.gz", hash = "sha256:025bccbbf0fa05b6192bc64ae1e7b16e001fd6d6d4d5de03c97b1c1ade523bef", size = 1154254, upload-time = "2026-07-04T15:31:22.699Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5d/40/e1e72872c6354b306daef1703549e8e83b4d43cfea356311bf722a043752/setuptools-83.0.0-py3-none-any.whl", hash = "sha256:29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3", size = 1008090, upload-time = "2026-07-04T15:31:20.885Z" },
-]
-
-[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -435,26 +413,22 @@ wheels = [
 [[package]]
 name = "wigner"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "cmasher" },
-    { name = "cython" },
     { name = "disutils" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "scipy" },
-    { name = "setuptools" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "cmasher", specifier = ">=1.9.2" },
-    { name = "cython", specifier = "==0.29.36" },
     { name = "disutils", specifier = ">=1.4.32.post2" },
     { name = "matplotlib", specifier = "==3.7.3" },
     { name = "numpy", specifier = "==1.24.3" },
     { name = "scipy", specifier = "==1.11.1" },
-    { name = "setuptools", specifier = ">=83.0.0" },
 ]
 
 [[package]]

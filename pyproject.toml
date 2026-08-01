@@ -6,10 +6,15 @@ readme = "README.md"
 requires-python = "==3.11.15"
 dependencies = [
     "cmasher>=1.9.2",
-    "cython==0.29.36",
     "disutils>=1.4.32.post2",
     "matplotlib==3.7.3",
     "numpy==1.24.3",
     "scipy==1.11.1",
-    "setuptools>=83.0.0",
 ]
+
+[build-system]
+requires = ["setuptools>=83.0.0", "cython==0.29.36", "numpy==1.24.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}

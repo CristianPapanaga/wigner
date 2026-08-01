@@ -41,7 +41,7 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
     cdef np.ndarray[np.float_t, ndim = 1, mode = "c"] randfloats, i_spin_initial, i_spin_candidate, i_spin_diff
     cdef np.ndarray[np.float_t, ndim = 2, mode = "c"] randgauss, spin_lattice, randspins
 
-    # Fast temporary registers for explicit 3D vector operations
+    # Fast temporary registers for explicit vector operations.
     cdef double sx_init, sy_init, sz_init
     cdef double sx_cand, sy_cand, sz_cand
     cdef double sdx, sdy, sdz
@@ -94,7 +94,7 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
     E_arrays = []
 
     schedule = np.round(schedule, 3)
-    print("Simulation starting...")
+    print("Simulation starting...!!")
 
     for T in schedule:
         # Sample random values for later use; fastest to sample in one go rather than every time we need a new random value.
@@ -106,7 +106,7 @@ cpdef void wigner_anneal(np.ndarray[np.int64_t, ndim = 1, mode = "c"] particle_l
 
         data_collection_counter = 0
 
-        print(f"Starting simulation at T = {T}.")
+        print(f"Starting simulationddd at T = {T}.")
 
         for step in range(0, n_steps):
             deltaE = 0.0
