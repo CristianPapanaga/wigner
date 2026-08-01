@@ -92,6 +92,12 @@ particle_lattice = lat_utils.generate_filled_square_lattice(L, filling=0.75)
 # Run the simulated annealing simulation.
 wigner.wigner_anneal(particle_lattice, 3, n_sweeps, V_list, J_list, schedule)
 ```
+Key parameters of `generate_filled_square_lattice`:
+
+| Argument | Description |
+| --- | --- |
+| `L` | Linear dimension of the square lattice (the lattice has `L²` sites). |
+| `filling` | Filling fraction, between 0 (exclusive) and 1 (inclusive); must be chosen such that `L * filling` is an integer (default `1`). |
 
 Key parameters of `wigner_anneal`:
 
@@ -136,24 +142,25 @@ Note that if you wish to make changes to the Cython files `wigner.pyx` or `latti
 ```bash
 uv sync --reinstall-package wigner
 ```
+## Examples
 
-## Project structure
+The figures below show the `testing.py` simulated-annealing run on an 8 × 8 lattice at 75% filling, with equal density and spin couplings ($V = J = 1$). Note that the output is not deterministic and so another run may find a different ordered ground state.
 
-```
-wigner/
-├── assets/
-│   └── poster.png              # Project poster
-├── src/
-│   ├── wigner.pyx              # Main simulated-annealing Monte Carlo engine
-│   ├── lattice_utilities.pyx   # Lattice generation and neighbour lookup
-│   ├── data_utilities.py       # Data saving/loading, specific heat, plotting
-│   ├── data_analysis.py        # Example analysis pipeline
-│   ├── testing.py              # Example simulation
-│   ├── data/                   # Simulation output data
-│   └── visualizations/         # Generated plots
-├── setup.py                    # Cython build configuration
-└── pyproject.toml              # Project metadata and dependencies
-```
+### Annealing and specific heat
+
+As the system is cooled from $T = 0.2$ to $T = 0$, the energy per site decreases and the specific heat develops a peak, signalling the ordering transition.
+
+| Energy (per site) annealing plot | Specific heat plot |
+| :---: | :---: |
+| ![Energy (per site) annealing plot](assets/Energy%20(per%20site)%20annealing%20plot.png) | ![Specific heat plot](assets/Specific%20heat%20plot.png) |
+
+### Charge and spin order
+
+The final low-temperature configuration shows the charge-ordered electron crystal. The spin vectors reveal the in-plane spin component (arrows) and the out-of-plane component (colour).
+
+| Lattice | Lattice with spin vectors |
+| :---: | :---: |
+| ![Lattice](assets/Lattice.png) | ![Lattice with spin vectors](assets/Lattice%20with%20spin%20vectors.png) |
 
 ## References and further reading
 
